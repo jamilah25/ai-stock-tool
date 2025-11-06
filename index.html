@@ -1,0 +1,64 @@
+
+import streamlit as st
+import yfinance as yf
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+import plotly.graph_objects as go
+from datetime import datetime, timedelta
+import json
+
+# Page configuration
+st.set_page_config(page_title="AI Stock & Crypto Analysis Tool", layout="wide")
+
+# Initialize session state
+if 'portfolio' not in st.session_state:
+    st.session_state.portfolio = []
+if 'alerts' not in st.session_state:
+    st.session_state.alerts = []
+
+# Sidebar navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Stock Prediction", "Portfolio Tracker", "Price Alerts", "Crypto Tracker", "Market Overview"])
+
+# Helper functions
+def calculate_rsi(prices, period=14):
+    """Calculate RSI indicator"""
+    delta = prices.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+def predict_stock(ticker, start_date, end_date, model_type='Random Forest'):
+    """Predict stock prices using ML"""
+    try:
+        data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+        
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = data.columns.get_level_values(0)
+
+        if data.empty:
+            return None, "No data found"
+
+        # Technical indicators
+        data['MA_7'] = data['Close'].rolling(window=7).mean()
+        data['MA_21'] = data['Close'].rolling(window=21).mean()
+        data['RSI'] = calculate_rsi(data['Close'])
+        data['Volume_Change'] = data['Volume'].pct_change()
+        data = data.dropna()
+
+        # Prepare features
+        features = ['MA_7', 'MA_21', 'RSI', 'Volume_Change']
+        X = data[features].values
+        y = data['Close'].values
+
+        # Train model
+        if model_type == 'Linear Regression':
+            model = LinearRegression()
+        else:
+            model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+        model.
