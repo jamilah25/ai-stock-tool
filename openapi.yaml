@@ -1,0 +1,175 @@
+openapi: 3.0.3
+info:
+  title: AutomateCash API
+  version: "1.0.0"
+  description: API for AutomateCash forex trading platform (MVP).
+servers:
+  - url: https://api.automatecash.com/v1
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                phone:
+                  type: string
+                password:
+                  type: string
+                full_name:
+                  type: string
+              required: [email, phone, password, full_name]
+      responses:
+        "200":
+          description: User created, returns tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+  /auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email_or_phone:
+                  type: string
+                password:
+                  type: string
+              required: [email_or_phone, password]
+      responses:
+        "200":
+          description: Login success
+  /user/me:
+    get:
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user profile
+  /user/kyc:
+    post:
+      summary: Upload KYC documents
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id_front:
+                  type: string
+                  format: binary
+                id_back:
+                  type: string
+                  format: binary
+                selfie:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: KYC submitted
+  /wallet/deposit/init:
+    post:
+      summary: Create deposit intent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                currency:
+                  type: string
+                method:
+                  type: string
+              required: [amount, currency, method]
+      responses:
+        "200":
+          description: Deposit intent created
+  /payments/webhook/flutterwave:
+    post:
+      summary: Flutterwave webhook endpoint
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: webhook accepted
+  /market/pairs:
+    get:
+      summary: List tradable pairs
+      responses:
+        "200":
+          description: list of pairs
+  /market/quote:
+    get:
+      summary: Get best bid/ask for pair
+      parameters:
+        - name: pair
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: quote returned
+  /order:
+    post:
+      summary: Place an order (market)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pair:
+                  type: string
+                side:
+                  type: string
+                  enum: [buy, sell]
+                type:
+                  type: string
+                quantity:
+                  type: number
+              required: [pair, side, type, quantity]
+      responses:
+        "200":
+          description: order placed
+  /positions:
+    get:
+      summary: List positions for current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: list of positions
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

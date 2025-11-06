@@ -1,0 +1,117 @@
+{
+  "info": {
+    "name": "AutomateCash API - MVP",
+    "_postman_id": "automatecash-mvp-001",
+    "description": "Basic Postman collection for AutomateCash MVP endpoints (uses defaults).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Signup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"phone\": \"+256712345678\",\n  \"password\": \"P@ssw0rd!\",\n  \"full_name\": \"Alice Trader\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/signup",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "signup"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email_or_phone\": \"alice@example.com\",\n  \"password\": \"P@ssw0rd!\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Pairs",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/market/pairs",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "market",
+            "pairs"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Place Order (Market)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pair\": \"EUR/USD\",\n  \"side\": \"buy\",\n  \"type\": \"MARKET\",\n  \"quantity\": 0.1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/order",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "order"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.automatecash.com/v1"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    }
+  ]
+}
